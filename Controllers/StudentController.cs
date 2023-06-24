@@ -13,12 +13,18 @@ namespace dotnet_webapi.Controllers
     public class StudentController : ControllerBase
     {
         [HttpGet("all", Name = "GetAllStudents")]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(200)]
         public ActionResult<IEnumerable<Student>> GetStudents()
         {
             return Ok(StudentRepository.Students);
         }
 
         [HttpGet("{id:int}", Name = "GetStudentById")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public ActionResult<Student> GetStudentById(int id)
 
         {
@@ -35,6 +41,10 @@ namespace dotnet_webapi.Controllers
         }
 
         [HttpDelete("{id:int}", Name = "DeleteStudentById")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public ActionResult<bool> DeleteStudentById(int id)
         {
             if (id <= 0)
