@@ -13,25 +13,42 @@ namespace dotnet_webapi.Controllers
     public class StudentController : ControllerBase
     {
         [HttpGet("all", Name = "GetAllStudents")]
-        public IEnumerable<Student> GetStudents()
+        public ActionResult<IEnumerable<Student>> GetStudents()
         {
-            return StudentRepository.Students;
+            return Ok(StudentRepository.Students);
         }
 
         [HttpGet("{id:int}", Name = "GetStudentById")]
-        public Student GetStudentById(int id)
-        {
+        public ActionResult<Student> GetStudentById(int id)
 
-            return StudentRepository.Students.Where(x => x.Id == id).First();
+        {
+            if (id <= 0)
+            {
+                return BadRequest($"Invalid Student Id {id}");
+            }
+
+            if (StudentRepository.Students.Where(x => x.Id == id).Count() == 0)
+            {
+                return NotFound($"Student with Id {id} not found");
+            }
+            return Ok(StudentRepository.Students.Where(x => x.Id == id).First());
         }
 
         [HttpDelete("{id:int}", Name = "DeleteStudentById")]
-        public bool DeleteStudentById(int id)
+        public ActionResult<bool> DeleteStudentById(int id)
         {
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
 
+            if (StudentRepository.Students.Where(x => x.Id == id).Count() == 0)
+            {
+                return NotFound();
+            }
             var student = StudentRepository.Students.Where(x => x.Id == id).First();
             StudentRepository.Students.Remove(student);
-            return true;
+            return Ok(true);
         }
 
     }
