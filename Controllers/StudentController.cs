@@ -30,6 +30,7 @@ namespace dotnet_webapi.Controllers
 				{
 					Id = x.Id,
 					StudentName = x.StudentName,
+					Age = x.Age,
 					Email = x.Email,
 					Address = x.Address
 				});
@@ -69,8 +70,10 @@ namespace dotnet_webapi.Controllers
 				{
 					Id = newId,
 					StudentName = model.StudentName,
+					Age = model.Age,
 					Email = model.Email,
-					Address = model.Address
+					Address = model.Address,
+					AdmissionDate = DateTime.Now
 				};
 
 				StudentRepository.Students.Add(student);
