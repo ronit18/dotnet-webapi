@@ -17,7 +17,14 @@ namespace dotnet_webapi.Controllers
 		[ProducesResponseType(200)]
 		public ActionResult<IEnumerable<Student>> GetStudents()
 		{
-			return Ok(StudentRepository.Students);
+			try
+			{
+				return Ok(StudentRepository.Students);
+			}
+			catch (Exception)
+			{
+				return StatusCode(500, "Internal Server Error");
+			}
 		}
 
 		[HttpGet("{id:int}", Name = "GetStudentById")]
@@ -28,16 +35,25 @@ namespace dotnet_webapi.Controllers
 		public ActionResult<Student> GetStudentById(int id)
 
 		{
-			if (id <= 0)
+
+			try
 			{
-				return BadRequest($"Invalid Student Id {id}");
+				if (id <= 0)
+				{
+					return BadRequest($"Invalid Student Id {id}");
+				}
+
+				if (StudentRepository.Students.Where(x => x.Id == id).Count() == 0)
+				{
+					return NotFound($"Student with Id {id} not found");
+				}
+				return Ok(StudentRepository.Students.Where(x => x.Id == id).First());
+			}
+			catch (Exception)
+			{
+				return StatusCode(500, "Internal Server Error");
 			}
 
-			if (StudentRepository.Students.Where(x => x.Id == id).Count() == 0)
-			{
-				return NotFound($"Student with Id {id} not found");
-			}
-			return Ok(StudentRepository.Students.Where(x => x.Id == id).First());
 		}
 
 		[HttpDelete("{id:int}", Name = "DeleteStudentById")]
@@ -45,20 +61,29 @@ namespace dotnet_webapi.Controllers
 		[ProducesResponseType(400)]
 		[ProducesResponseType(404)]
 		[ProducesResponseType(500)]
-		public ActionResult<bool> DeleteStudentById(int id)
+		public IActionResult DeleteStudentById(int id)
 		{
-			if (id <= 0)
+			try
 			{
-				return BadRequest();
+				if (id <= 0)
+				{
+					return BadRequest($"Invalid Student Id {id}");
+				}
+
+				if (StudentRepository.Students.Where(x => x.Id == id).Count() == 0)
+				{
+					return NotFound($"Student with Id {id} not found");
+				}
+				var student = StudentRepository.Students.Where(x => x.Id == id).First();
+				StudentRepository.Students.Remove(student);
+				return Ok("Student Deleted Successfully");
+			}
+			catch (Exception)
+			{
+				return StatusCode(500, "Internal Server Error");
 			}
 
-			if (StudentRepository.Students.Where(x => x.Id == id).Count() == 0)
-			{
-				return NotFound();
-			}
-			var student = StudentRepository.Students.Where(x => x.Id == id).First();
-			StudentRepository.Students.Remove(student);
-			return Ok(true);
+
 		}
 
 	}
