@@ -162,5 +162,33 @@ namespace dotnet_webapi.Controllers
 
 		}
 
+		[HttpPut("update", Name = "UpdateStudent")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
+		[ProducesResponseType(500)]
+		public ActionResult<StudentDto> UpdateStudent([FromBody] StudentDto model)
+
+		{
+			if (model == null || model.Id <= 0)
+			{
+				return BadRequest("Invalid Student Id");
+			}
+			var existingStudent = StudentRepository.Students.Where(x => x.Id == model.Id).FirstOrDefault();
+
+			if (existingStudent == null)
+			{
+				return NotFound($"Student with Id {model.Id} not found");
+			}
+
+			existingStudent.StudentName = model.StudentName;
+			existingStudent.Age = model.Age;
+			existingStudent.Email = model.Email;
+			existingStudent.Address = model.Address;
+
+
+			return Ok("Student Updated Successfully");
+		}
+
 	}
 }
