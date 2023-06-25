@@ -12,14 +12,27 @@ namespace dotnet_webapi.Controllers
 	[ApiController]
 	public class StudentController : ControllerBase
 	{
+
+		/// <summary>
+		/// Get all Students
+		/// </summary>
+		/// <returns></returns>
 		[HttpGet("all", Name = "GetAllStudents")]
 		[ProducesResponseType(500)]
 		[ProducesResponseType(200)]
-		public ActionResult<IEnumerable<Student>> GetStudents()
+		public ActionResult<IEnumerable<StudentDto>> GetStudents()
 		{
 			try
 			{
-				return Ok(StudentRepository.Students);
+				var students = StudentRepository.Students.Select(x => new StudentDto
+				{
+					Id = x.Id,
+					StudentName = x.StudentName,
+					Email = x.Email,
+					Address = x.Address
+				});
+
+				return Ok(students);
 			}
 			catch (Exception)
 			{
