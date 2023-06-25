@@ -17,6 +17,8 @@ namespace dotnet_webapi.Controllers
 		/// Get all Students
 		/// </summary>
 		/// <returns></returns>
+
+		// GET api/student/all
 		[HttpGet("all", Name = "GetAllStudents")]
 		[ProducesResponseType(500)]
 		[ProducesResponseType(200)]
@@ -40,6 +42,56 @@ namespace dotnet_webapi.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Add Student
+		/// </summary>
+		/// <param name="model"></param>
+		/// <returns></returns>
+
+		// POST api/student/add
+		[HttpPost("add", Name = "AddStudent")]
+		[ProducesResponseType(201)]
+		[ProducesResponseType(409)]
+		[ProducesResponseType(500)]
+		public ActionResult<StudentDto> CreateStudent([FromBody] StudentDto model)
+		{
+			try
+			{
+				if (model == null)
+				{
+					return BadRequest("Student object is null");
+				}
+
+
+				int newId = StudentRepository.Students.Last().Id + 1;
+
+				var student = new Student
+				{
+					Id = newId,
+					StudentName = model.StudentName,
+					Email = model.Email,
+					Address = model.Address
+				};
+
+				StudentRepository.Students.Add(student);
+				model.Id = student.Id;
+
+				return StatusCode(201, "Created Student Successfully.");
+
+			}
+			catch (Exception)
+			{
+				return StatusCode(500, "Internal Server Error");
+			}
+		}
+
+		/// <summary>
+		/// Get Student by Id
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+
+		// GET api/student/{id}
 		[HttpGet("{id:int}", Name = "GetStudentById")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(400)]
@@ -69,6 +121,14 @@ namespace dotnet_webapi.Controllers
 
 		}
 
+
+		/// <summary>   
+		/// Delete Student by Id
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns>Deleted Student</returns>
+
+		// DELETE api/student/{id}  
 		[HttpDelete("{id:int}", Name = "DeleteStudentById")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(400)]
