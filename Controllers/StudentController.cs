@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using dotnet_webapi.Model;
 using dotnet_webapi.Models;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace dotnet_webapi.Controllers
@@ -186,6 +187,47 @@ namespace dotnet_webapi.Controllers
 			existingStudent.Email = model.Email;
 			existingStudent.Address = model.Address;
 
+
+			return Ok("Student Updated Successfully");
+		}
+
+		[HttpPatch("{id:int}/updateRequired", Name = "UpdateStudentByPatch")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(404)]
+		[ProducesResponseType(500)]
+		public ActionResult<StudentDto> UpdateStudentByPatch(int id, [FromBody] JsonPatchDocument<StudentDto> patchDocument)
+
+		{
+			if (patchDocument == null || id <= 0)
+			{
+				return BadRequest("Invalid Student Id");
+			}
+			var existingStudent = StudentRepository.Students.Where(x => x.Id == id).FirstOrDefault();
+
+			if (existingStudent == null)
+			{
+				return NotFound($"Student with Id {id} not found");
+			}
+
+			var studentDto = new StudentDto
+			{
+				Id = existingStudent.Id,
+				StudentName = existingStudent.StudentName,
+				Email = existingStudent.Email,
+				Address = existingStudent.Address,
+				Age = existingStudent.Age,
+				AddmissionDate = existingStudent.AdmissionDate
+			};
+			patchDocument.ApplyTo(studentDto, ModelState);
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+			existingStudent.StudentName = studentDto.StudentName;
+			existingStudent.Age = studentDto.Age;
+			existingStudent.Email = studentDto.Email;
+			existingStudent.Address = studentDto.Address;
 
 			return Ok("Student Updated Successfully");
 		}
